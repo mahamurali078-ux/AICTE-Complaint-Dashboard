@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AICTE Complaint Dashboard</title>
+<style>
+:root{--navy:#12213d;--blue:#2457d6;--light:#f4f7fc;--ink:#17243b;--muted:#69758b;--line:#e3e9f3;--green:#15865b;--orange:#b9680b;--red:#bf3e48}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--light);color:var(--ink)}
+header{background:linear-gradient(120deg,#12213d,#244b91);color:#fff;padding:24px 18px 28px}
+.wrap{max-width:1150px;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-size:13px;letter-spacing:1.4px;font-weight:bold;opacity:.85}.pill{border:1px solid #ffffff60;border-radius:24px;padding:8px 12px;font-size:12px}
+h1{margin:22px 0 7px;font-size:clamp(25px,5vw,38px)}header p{margin:0;color:#d8e4fb;line-height:1.5}
+main{max-width:1150px;margin:0 auto;padding:20px 16px 42px}.notice{display:none;padding:12px 14px;border-radius:10px;background:#e6f6ed;color:#176342;margin-bottom:14px}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}.metric,.panel{background:white;border:1px solid var(--line);border-radius:14px;box-shadow:0 3px 12px #19345b08}
+.metric{padding:17px}.metric .label{font-size:13px;color:var(--muted)}.metric .num{font-size:31px;font-weight:750;margin:9px 0 4px}.metric small{color:var(--muted);font-size:12px}
+.layout{display:grid;grid-template-columns:1.35fr .9fr;gap:16px}.panel{padding:18px;margin-bottom:16px}.panel h2{font-size:18px;margin:0 0 15px}.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:13px}input,select,textarea{font:inherit;border:1px solid #d7dfec;border-radius:8px;padding:10px 11px;background:#fff;color:var(--ink);width:100%;min-width:0}input:focus,select:focus,textarea:focus{outline:2px solid #b8cbff;border-color:var(--blue)}.toolbar input{flex:1;min-width:150px}.toolbar select{width:auto;flex:0 1 155px}
+.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:560px}th,td{text-align:left;padding:12px 9px;border-bottom:1px solid #edf0f6;font-size:13px}th{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}.status{display:inline-block;border-radius:20px;padding:5px 8px;font-size:11px;font-weight:bold}.Pending{background:#fff0d9;color:#9a5800}.Resolved{background:#dcf6e8;color:#087147}.Progress{background:#e4edff;color:#244db1}.Urgent{background:#ffe3e5;color:#a52732}
+button{border:0;border-radius:9px;padding:11px 14px;font-weight:bold;cursor:pointer;background:var(--blue);color:white}button:hover{filter:brightness(.94)}button.secondary{background:#edf2ff;color:#244db1}button.ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:12px;font-weight:bold;color:#536078}.field.full{grid-column:1/-1}.field textarea{min-height:84px;resize:vertical}.form-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.empty{text-align:center;color:var(--muted);padding:24px}.barrow{margin:15px 0}.barhead{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px}.track{height:9px;background:#edf1f8;border-radius:20px;overflow:hidden}.fill{height:100%;border-radius:20px;background:linear-gradient(90deg,#2457d6,#56a0ff)}.smallnote{font-size:12px;color:var(--muted);line-height:1.5}.footer{text-align:center;font-size:12px;color:var(--muted);padding:8px}
+@media(max-width:780px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:1fr}.metric{padding:14px}.metric .num{font-size:27px}}
+@media(max-width:420px){.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.top{align-items:flex-start}.pill{white-space:nowrap}.panel{padding:14px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+ <div class="top"><div class="brand">AICTE • INSTITUTIONAL GRIEVANCE MONITORING</div><div class="pill">PROTOTYPE · DEMO DATA</div></div>
+ <h1>Complaint Tracking Dashboard</h1>
+ <p>Monitor, assign and track institution complaint cases across AICTE bureaus and cells.</p>
+</div></header>
+<main>
+<div class="notice" id="notice" role="status"></div>
+<section class="metrics">
+ <div class="metric"><div class="label">Total complaints</div><div class="num" id="total">6</div><small>All registered cases</small></div>
+ <div class="metric"><div class="label">Pending</div><div class="num" id="pending">2</div><small>Awaiting action</small></div>
+ <div class="metric"><div class="label">In progress</div><div class="num" id="progress">2</div><small>Under review</small></div>
+ <div class="metric"><div class="label">Resolved</div><div class="num" id="resolved">2</div><small>Action completed</small></div>
+</section>
+<div class="layout">
+ <section class="panel">
+  <h2>Complaint register</h2>
+  <div class="toolbar"><input id="search" placeholder="Search ID, institution, subject…" aria-label="Search complaints"><select id="filter" aria-label="Filter by status"><option value="All">All statuses</option><option>Pending</option><option>Progress</option><option>Resolved</option></select></div>
+  <div class="table-wrap"><table><thead><tr><th>Case ID / Subject</th><th>Institution</th><th>Bureau / Cell</th><th>Status</th></tr></thead><tbody id="rows"></tbody></table></div>
+  <p class="smallnote">Demo records are illustrative only. Add a complaint using the form; data stays in this page during the current session.</p>
+ </section>
+ <section>
+  <div class="panel">
+   <h2>Register a complaint</h2>
+   <form id="complaintForm">
+    <div class="formgrid">
+     <div class="field"><label for="institution">Institution name *</label><input id="institution" required placeholder="e.g. ABC Institute"></div>
+     <div class="field"><label for="bureau">Bureau / Cell *</label><select id="bureau" required><option value="">Select cell</option><option>Approval Bureau</option><option>Student Grievance Cell</option><option>Finance Bureau</option><option>Administration</option><option>Regional Office</option><option>Other</option></select></div>
+     <div class="field full"><label for="subject">Complaint subject *</label><input id="subject" required placeholder="Brief subject"></div>
+     <div class="field"><label for="priority">Priority</label><select id="priority"><option>Normal</option><option>Urgent</option><option>High</option></select></div>
+     <div class="field"><label for="status">Initial status</label><select id="status"><option>Pending</option><option>Progress</option><option>Resolved</option></select></div>
+     <div class="field full"><label for="details">Complaint details</label><textarea id="details" placeholder="Enter a short description (optional)"></textarea></div>
+    </div>
+    <div class="form-actions"><button type="submit">+ Add complaint</button><button type="reset" class="ghost">Clear form</button></div>
+   </form>
+  </div>
+  <div class="panel"><h2>Status overview</h2><div id="bars"></div><p class="smallnote">Use this overview to quickly see the distribution of cases by status.</p></div>
+ </section>
+</div>
+<div class="footer">AICTE Complaint Dashboard · Student project prototype · Not an official AICTE system</div>
+</main>
+<script>
+const complaints=[
+{id:"CMP-1001",subject:"Approval application delay",institution:"Sunrise Institute of Tech",bureau:"Approval Bureau",status:"Pending",priority:"High"},
+{id:"CMP-1002",subject:"Scholarship reimbursement",institution:"Greenfield Engineering College",bureau:"Finance Bureau",status:"Progress",priority:"Normal"},
+{id:"CMP-1003",subject:"Student grievance follow-up",institution:"National College of Studies",bureau:"Student Grievance Cell",status:"Resolved",priority:"Normal"},
+{id:"CMP-1004",subject:"Faculty document verification",institution:"Riverdale Polytechnic",bureau:"Regional Office",status:"Pending",priority:"Urgent"},
+{id:"CMP-1005",subject:"Portal correction request",institution:"Bright Future Institute",bureau:"Administration",status:"Progress",priority:"Normal"},
+{id:"CMP-1006",subject:"Affiliation record update",institution:"Metro Technical Campus",bureau:"Approval Bureau",status:"Resolved",priority:"Normal"}
+];
+const $=id=>document.getElementById(id);
+function render(){
+ const q=$("search").value.toLowerCase(),f=$("filter").value;
+ const visible=complaints.filter(c=>(f==="All"||c.status===f)&&[c.id,c.subject,c.institution,c.bureau].join(" ").toLowerCase().includes(q));
+ $("rows").innerHTML=visible.length?visible.map(c=>`<tr><td><strong>${esc(c.id)}</strong><br><span style="color:#69758b">${esc(c.subject)}</span>${c.priority==="Urgent"?' <span class="status Urgent">Urgent</span>':""}</td><td>${esc(c.institution)}</td><td>${esc(c.bureau)}</td><td><select aria-label="Update status for ${esc(c.id)}" onchange="updateStatus('${c.id}',this.value)"><option ${c.status==="Pending"?"selected":""}>Pending</option><option ${c.status==="Progress"?"selected":""}>Progress</option><option ${c.status==="Resolved"?"selected":""}>Resolved</option></select><br><span class="status ${c.status}" style="margin-top:5px">${c.status==="Progress"?"In progress":c.status}</span></td></tr>`).join(""):`<tr><td colspan="4" class="empty">No matching complaints found.</td></tr>`;
+ const count=s=>complaints.filter(c=>c.status===s).length;
+ $("total").textContent=complaints.length;$("pending").textContent=count("Pending");$("progress").textContent=count("Progress");$("resolved").textContent=count("Resolved");
+ $("bars").innerHTML=[["Pending",count("Pending")],["In progress",count("Progress")],["Resolved",count("Resolved")]].map(([n,v])=>`<div class="barrow"><div class="barhead"><span>${n}</span><strong>${v} (${Math.round(v/complaints.length*100)}%)</strong></div><div class="track"><div class="fill" style="width:${v/complaints.length*100}%"></div></div></div>`).join("");
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+window.updateStatus=(id,status)=>{const c=complaints.find(x=>x.id===id);if(c){c.status=status;render();show("Status updated for "+id+".");}};
+function show(msg){$("notice").textContent=msg;$("notice").style.display="block";setTimeout(()=>{$("notice").style.display="none"},3500)}
+$("search").addEventListener("input",render);$("filter").addEventListener("change",render);
+$("complaintForm").addEventListener("submit",e=>{e.preventDefault();const institution=$("institution").value.trim(),bureau=$("bureau").value,subject=$("subject").value.trim();if(!institution||!bureau||!subject)return;const id="CMP-"+(1001+complaints.length);complaints.unshift({id,subject,institution,bureau,status:$("status").value,priority:$("priority").value});render();e.target.reset();show("Complaint "+id+" added successfully.");});
+render();
+</script>
+</body>
+</html>
